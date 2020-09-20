@@ -5,6 +5,60 @@ with data. The application contains information about all employees at a company
 Mongo database is bootstrapped with a serialized snapshot of the database. While the application runs, the data may be
 accessed and mutated in the database without impacting the snapshot.
 
+## Delivery Explanation
+The employeeId field in Employee annotated with @Id annotation to fix the update employee service 
+The following endpoints are available to use:
+```
+* READ ReportingStructure
+    * HTTP Method: GET 
+    * URL: localhost:8080/employee/{id}/reports
+    * RESPONSE: ReportingStructure
+* READ Compensation 
+    * HTTP Method: GET 
+    * URL: localhost:8080/compensation/employee/{id}
+    * RESPONSE: Compensation
+* UPDATE
+    * HTTP Method: PUT 
+    * URL: localhost:8080/compensation/employee/{id}
+    * PAYLOAD: Compensation
+    * RESPONSE: Compensation
+```
+
+### New Payloads explanation
+ReportingStructure and Compensation JSON schema:
+```json
+{
+  "type":"ReportingStructure",
+  "properties": {
+    "numberOfReports": {
+      "type": "number"
+    },
+    "employee": {
+      "$ref": "#/Employee"
+    }
+  }
+}
+```
+Compensation JSON schema
+``` json
+
+ {
+     "type":"Compensation",
+     "properties": {
+       "salary": {
+         "type": "number"
+      },
+      "compensationDate": {
+        "type": "string",
+        "format": "date"   
+      }, 
+      "employee": {
+         "$ref": "#/Employee"
+      }
+    }
+ }
+```
+
 ### How to Run
 The application may be executed by running `gradlew bootRun`.
 
@@ -84,3 +138,5 @@ Compensation from the persistence layer.
 
 ## Delivery
 Please upload your results to a publicly accessible Git repo. Free ones are provided by Github and Bitbucket.
+
+

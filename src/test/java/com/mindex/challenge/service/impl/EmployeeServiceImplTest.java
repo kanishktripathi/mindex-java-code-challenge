@@ -1,7 +1,9 @@
 package com.mindex.challenge.service.impl;
 
+import java.util.Arrays;
 import com.mindex.challenge.data.Employee;
 import com.mindex.challenge.service.EmployeeService;
+import com.mindex.challenge.service.data.ReportingStructure;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +26,7 @@ public class EmployeeServiceImplTest {
 
     private String employeeUrl;
     private String employeeIdUrl;
+    private String employeeReportUrl;
 
     @Autowired
     private EmployeeService employeeService;
@@ -38,6 +41,7 @@ public class EmployeeServiceImplTest {
     public void setup() {
         employeeUrl = "http://localhost:" + port + "/employee";
         employeeIdUrl = "http://localhost:" + port + "/employee/{id}";
+        employeeReportUrl = "http://localhost:" + port + "/employee/{id}/reports";
     }
 
     @Test
@@ -82,5 +86,24 @@ public class EmployeeServiceImplTest {
         assertEquals(expected.getLastName(), actual.getLastName());
         assertEquals(expected.getDepartment(), actual.getDepartment());
         assertEquals(expected.getPosition(), actual.getPosition());
+    }
+
+    @Test
+    public void testReportTreeWithOneDirectReportNotPresentInDb() {
+        Employee head = new Employee("head");
+        head.setDirectReports(Arrays.asList(new Employee("sub1"), new Employee("sub2")));
+        Employee sub1 = new Employee("sub1");
+        Employee sub2 = new Employee("sub2");
+        Employee sub3 = new Employee("sub3");
+        // one direct report is not put in the DB
+        sub1.setDirectReports(Arrays.asList(new Employee("sub3"), new Employee("sub4")));
+        employeeService.update(head);
+        employeeService.update(sub1);
+        employeeService.update(sub2);
+        employeeService.update(sub3);
+        ReportingStructure reportingStructure = restTemplate.getForEntity(employeeReportUrl,
+          ReportingStructure.class, head.getEmployeeId()).getBody();
+        assertNotNull(reportingStructure);
+        assertEquals("Number of reports", 3, reportingStructure.getNumberOfReports());
     }
 }

@@ -1,8 +1,12 @@
 package com.mindex.challenge.data;
 
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.annotation.Id;
 
 public class Employee {
+
+    @Id
     private String employeeId;
     private String firstName;
     private String lastName;
@@ -11,6 +15,12 @@ public class Employee {
     private List<Employee> directReports;
 
     public Employee() {
+        directReports = new ArrayList<>();
+    }
+
+    public Employee(String id) {
+        this();
+        this.employeeId = id;
     }
 
     public String getEmployeeId() {
@@ -59,5 +69,15 @@ public class Employee {
 
     public void setDirectReports(List<Employee> directReports) {
         this.directReports = directReports;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Employee employee = (Employee) o;
+
+        return employeeId != null ? employeeId.equals(employee.employeeId) : employee.employeeId == null;
     }
 }
